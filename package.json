@@ -7,7 +7,18 @@
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": ["chat", "app"],
+  "keywords": [
+    "chat",
+    "app"
+  ],
   "author": "Ismail Bin Mujeeb",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.1",
+    "multer": "^1.4.5-lts.2"
+  }
 }
