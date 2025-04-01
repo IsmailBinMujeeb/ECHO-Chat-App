@@ -1,0 +1,13 @@
+{
+  "name": "echo-chat-app",
+  "version": "1.0.0",
+  "description": "A flexible web chat app",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["chat", "app"],
+  "author": "Ismail Bin Mujeeb",
+  "license": "ISC"
+}
