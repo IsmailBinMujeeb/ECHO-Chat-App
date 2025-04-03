@@ -2,9 +2,11 @@ import jwt from "jsonwebtoken";
 import userModel from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 
-export const authenticate = async (req, _, next) => {
+export const authenticate = async (req, res, next) => {
 
     const { ACCESS_TOKEN } =  req.cookies;
+
+    if (!ACCESS_TOKEN) return res.redirect('/user/signin')
 
     const decodedAccessToken = jwt.verify(ACCESS_TOKEN, process.env.ACCESS_TOKEN_SECRET);
 
