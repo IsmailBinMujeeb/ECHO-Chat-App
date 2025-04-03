@@ -8,6 +8,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         require: [true, 'userhandle is required in user model'],
         unique: [true, 'userhandle must be unique in user model'],
+        lowercase: true,
+        trim: true,
+        index: true,
         validate: {
             validator: function (value) {
                 return /^(?!bot)(?!.*bot$)[a-zA-Z0-9_]{3,20}$/.test(value);
@@ -16,16 +19,12 @@ const userSchema = new mongoose.Schema({
         }
     },
 
-    chatId: {
-        type: String,
-        require: [true, 'chatId is require in user model'],
-        unique: [true, 'chatId must be unique in user model']
-    },
-
     email: {
         type: String,
         require: [true, 'email is required in user model'],
         unique: [true, 'email must be unique in user model'],
+        lowercase: true,
+        trim: true,
         validate: {
             validator: function (value) {
                 return /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/.test(value);
@@ -40,7 +39,7 @@ const userSchema = new mongoose.Schema({
 
     profile: {
         type: String,
-        default: '', // TODO: Replace with actual default url
+        default: 'http://res.cloudinary.com/dpjpkfwhw/image/upload/v1740635465/jexftvmyggqanbw023xw.jpg',
     },
 
     bio: {
@@ -48,11 +47,6 @@ const userSchema = new mongoose.Schema({
         maxLength: 50,
         default: '',
     },
-
-    friends: [{
-        type: mongoose.Schema.Types.ObjectId,
-        default: [],
-    }],
 
     refreshToken: {
         type: String,
