@@ -6,6 +6,7 @@ config();
 // Routes Import
 import indexRouter from "./routes/home.router.js"
 import userRouter from "./routes/user.routes.js"
+import chatRouter from "./routes/chat.routes.js"
 
 const app = express();
 const PORT  = process.env.PORT;
@@ -20,5 +21,6 @@ app.use(cookieParser());
 
 app.use('/', indexRouter);
 app.use('/user/', userRouter);
+app.use('/chat/', chatRouter);
 
 export default app
