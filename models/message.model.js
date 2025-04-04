@@ -24,6 +24,16 @@ const messageSchema = mongoose.Schema({
         type: String,
         default: '',
         trim: true,
+    },
+
+    reactions: [{
+        type: String,
+        default: [],
+    }],
+
+    replyTo: {
+        type: mongoose.Schema.Types.ObjectId,
+        default: null
     }
 }, { timestamps: true });
 
