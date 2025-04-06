@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 
+const reactionSchema = mongoose.Schema({
+    user: String,
+    reaction: String
+})
+
 const messageSchema = mongoose.Schema({
 
     senderId: {
@@ -27,7 +32,7 @@ const messageSchema = mongoose.Schema({
     },
 
     reactions: [{
-        type: String,
+        type: reactionSchema,
         default: [],
     }],
 
