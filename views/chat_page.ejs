@@ -1,0 +1,513 @@
+<%- include('layouts/head.ejs', { title: 'Echo - Page', css: ['chat_page'] }) %>
+
+<main>
+
+    <!-- Contact -->
+    <section id="contactList">
+        <div class="contact-wrapper">
+            <div class="logo">
+                <i class="fa-solid fa-ghost"></i> ECHO
+            </div>
+            <div class="contacts">
+                <% chats?.forEach(chat => { %>
+                    <% if (chat?.reciever?.[0]?.userhandle == user?.userhandle) { %>
+                        <div class="contact-card" data-user="<%= chat?.sender?.[0]?.userhandle %>" onclick="goToProfile('<%= chat?.sender?.[0]?.userhandle %>')">
+                            <div class="profile-picture">
+                                <img src="https://cdn3.emoji.gg/emojis/71183-halloween-view.png" width="54px" height="54px" alt="halloween_view">
+                            </div>
+                            <div class="userhandle-message">
+                                <h4><%= chat?.sender?.[0]?.userhandle %></h4>
+                                <p><%= 3 %> Unread messages</p>
+                            </div>
+                            <div class="time-unreadmsg">
+                                <p>3:20</p>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="contact-card" data-user="<%= chat?.reciever?.[0]?.userhandle %>" onclick="goToProfile('<%= chat?.reciever?.[0]?.userhandle %>')">
+                            <div class="profile-picture">
+                                <img src="https://cdn3.emoji.gg/emojis/71183-halloween-view.png" width="54px" height="54px" alt="halloween_view">
+                            </div>
+                            <div class="userhandle-message">
+                                <h4><%= chat?.reciever?.[0]?.userhandle %></h4>
+                                <p><%= 3 %> Unread messages</p>
+                            </div>
+                            <div class="time-unreadmsg">
+                                <p>3:20</p>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }) %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat -->
+    <section id="chat">
+        <div class="chat-wrapper">
+            <div class="reciever-wrapper">
+                <img src="https://cdn3.emoji.gg/emojis/71183-halloween-view.png" width="44px" height="44px" alt="halloween_view"> 
+                <p><%= reciever?.userhandle %></p>
+                <div>
+                    <button onclick="startCall()"><i class="fa-solid fa-phone"></i></button>
+                    <button><i class="fa-solid fa-video"></i></button>
+                </div>
+            </div>
+            <div class="voice-call-wrapper" id="voiceCallWrapper">
+                <button><i class="fa-solid fa-microphone-slash" onclick=toggleMute() id="muteBtn"></i></button>
+                <button><i class="fa-solid fa-video"></i></button>
+                <button><i class="fa-solid fa-phone" onclick=acceptCall() id="acceptCall"></i></button>
+                <button><i class="fa-solid fa-phone-slash" onclick=rejectCall()></i></button>
+            </div>
+            <div id="chats">
+                <% const month = ["January","February","March","April","May","June","July","August","September","October","November","December"] %>
+
+                <% messages?.forEach((message, index) => { %>
+                    <% if (message?.createdAt.getDay() !== messages?.[index-1]?.createdAt.getDay()) { %>
+                        <div class="chat-date"><%= message?.createdAt.getDate() %> <%= month[message?.createdAt.getMonth()] %> <%= message?.createdAt.getFullYear() %></div>
+                    <% } %>
+                    
+                    <% if (message?.sender?.[0]?.userhandle === user?.userhandle) { %>
+                        <div class="chat-card right" id="<%= message?._id %>">
+                            <div class="options">
+                                <button onclick="togglePanel('<%= message?._id %>')"><i class="fa-solid fa-face-smile" id="emoji-btn"></i></button>
+                                <button onclick="selectReply('<%= message?._id %>')"><i class="fa-solid fa-reply"></i></button>
+                                <button><i class="fa-solid fa-ellipsis"></i></button>
+                            </div>
+                            <% if ( message?.replyTo[0] ) { %>
+                                <p class="reply-pera" onclick="scrollToMessage('<%= message?.replyTo?.[0]?._id %>')"><%= message?.replyTo?.[0]?.content %></p>
+                            <% } %>
+                            <div class="content-wrapper">
+                                <div class="text-time">
+                                    <p><%= message?.content %></p>
+                                    <span><%= message?.createdAt?.getHours() %>:<%= message?.createdAt?.getMinutes() %></span>
+                                </div>
+                                <div class="reactions">
+                                    <% for( let key in message?.reactionsCount ) { %>
+                                        <div class="reaction <%= key %>"><img src="/assets/emojis/face/<%= key %>.png" alt="<%= key %>" width="24px" height="24px"> <span><%= message?.reactionsCount[key] %></span></div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="chat-card left" id="<%= message?._id %>">
+                            <div class="options">
+                                <button onclick="togglePanel('<%= message?._id %>')"><i class="fa-solid fa-face-smile"></i></button>
+                                <button onclick="selectReply('<%= message?._id %>')"><i class="fa-solid fa-reply"></i></button>
+                                <button><i class="fa-solid fa-ellipsis"></i></button>
+                            </div>
+                            <% if ( message?.replyTo[0] ) { %>
+                                <p class="reply-pera" onclick="scrollToMessage('<%= message?.replyTo?.[0]?._id %>')"><%= message?.replyTo?.[0]?.content %></p>
+                            <% } %>
+                            <div class="content-wrapper">
+                                <div class="text-time">
+                                    <p><%= message?.content %></p>
+                                    <span><%= message?.createdAt?.getHours() %>:<%= message?.createdAt?.getMinutes() %></span>
+                                </div>
+                                <div class="reactions">
+                                    <% for( let key in message?.reactionsCount ) { %>
+                                            <div class="reaction <%= key %>" data-reaction="<%= key %>"><img src="/assets/emojis/face/<%= key %>.png" alt="<%= key %>" width="20px" height="20px"> <span><%= message?.reactionsCount[key] %></span></div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                    
+                <% }) %>
+                <video id="localVideo" autoplay muted playsinline></video>
+                <video id="remoteVideo" autoplay playsinline></video>
+                <div class="panel" id="panel">
+                    <div class="main-panel-wrapper">
+
+                        <div class="panel-btn" onclick="addReaction('fbangry')"><img src="/assets/emojis/face/fbangry.png" alt="fbangry" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbannoyed')"><img src="/assets/emojis/face/fbannoyed.png" alt="fbannoyed" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbblank')"><img src="/assets/emojis/face/fbblank.png" alt="fbblank" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbbreathe')"><img src="/assets/emojis/face/fbbreathe.png" alt="fbbreathe" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbdizzy')"><img src="/assets/emojis/face/fbdizzy.png" alt="fbdizzy" width="24px" height="24px"></div>
+
+                        <div class="panel-btn" onclick="addReaction('fbdrool')"><img src="/assets/emojis/face/fbdrool.png" alt="fbdrool" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbeyeroll')"><img src="/assets/emojis/face/fbeyeroll.png" alt="fbeyeroll" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbfreaky')"><img src="/assets/emojis/face/fbfreaky.png" alt="fbfreaky" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbfun')"><img src="/assets/emojis/face/fbfun.png" alt="fbfun" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbgoofy')"><img src="/assets/emojis/face/fbgoofy.png" alt="fbgoofy" width="24px" height="24px"></div>
+
+                        <div class="panel-btn" onclick="addReaction('fbgrin')"><img src="/assets/emojis/face/fbgrin.png" alt="fbgrin" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbhearteyes')"><img src="/assets/emojis/face/fbhearteyes.png" alt="fbhearteyes" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbmindblown')"><img src="/assets/emojis/face/fbmindblown.png" alt="fbmindblown" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbmoney')"><img src="/assets/emojis/face/fbmoney.png" alt="fbmoney" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbnerd')"><img src="/assets/emojis/face/fbnerd.png" alt="fbnerd" width="24px" height="24px"></div>
+
+                        <div class="panel-btn" onclick="addReaction('fbparty')"><img src="/assets/emojis/face/fbparty.png" alt="fbparty" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbsad')"><img src="/assets/emojis/face/fbsad.png" alt="fbsad" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbsalute')"><img src="/assets/emojis/face/fbsalute.png" alt="fbsalute" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbsee')"><img src="/assets/emojis/face/fbsee.png" alt="fbsee" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbshocked')"><img src="/assets/emojis/face/fbshocked.png" alt="fbshocked" width="24px" height="24px"></div>
+
+                        <div class="panel-btn" onclick="addReaction('fbshy')"><img src="/assets/emojis/face/fbshy.png" alt="fbshy" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbsleep')"><img src="/assets/emojis/face/fbsleep.png" alt="fbsleep" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbsob')"><img src="/assets/emojis/face/fbsob.png" alt="fbsob" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbstarstruck')"><img src="/assets/emojis/face/fbstarstruck.png" alt="fbstarstruck" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbswear')"><img src="/assets/emojis/face/fbswear.png" alt="fbswear" width="24px" height="24px"></div>
+
+                        <div class="panel-btn" onclick="addReaction('fbsweat')"><img src="/assets/emojis/face/fbsweat.png" alt="fbsweat" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbvomit')"><img src="/assets/emojis/face/fbvomit.png" alt="fbvomit" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbwink')"><img src="/assets/emojis/face/fbwink.png" alt="fbwink" width="24px" height="24px"></div>
+                        <div class="panel-btn" onclick="addReaction('fbyum')"><img src="/assets/emojis/face/fbyum.png" alt="fbyum" width="24px" height="24px"></div>
+
+                    </div>
+                </div>
+            </div>
+            <div id="reply-wrapper">
+                Replying to message
+                <i class="fa-solid fa-xmark" onclick="unselectReply()"></i>
+            </div>
+            <div class="input-wrapper">
+                <button type="menu"><i class="fa-solid fa-circle-plus"></i></button>
+                <input type="text" class="send-message" id="sendMessageInput" placeholder="Send Message">
+                <button type="menu" id="emojiBtn"><i class="fa-solid fa-face-smile" id="emojis"></i></button>
+                <button type="submit" id="sendBtn" onclick="sendMessage()"><i class="fa-regular fa-paper-plane"></i></button>
+                
+            </div>
+        </div>
+    </section>
+    
+</main>
+<script src="/js/chat_page.js"></script>
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js" integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+" crossorigin="anonymous"></script>
+<script>
+    
+    const socket = new io();
+    let peer;
+    let localStream;
+    let remoteStream;
+
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+
+    socket.emit("join-chat", { chatId: '<%= currentChat?.chatId %>', user: '<%= user?.userhandle %>' });
+
+    function sendMessage(){
+
+        const sendMessageInput = document.getElementById('sendMessageInput');
+        let replyToMessageId;
+        const message = sendMessageInput.value;
+
+        replyToMessageId = document.getElementById("reply-wrapper").dataset.id || null;
+
+        if (!message) return;
+
+        socket.emit("emit-message", { senderId: '<%= user?._id %>', recieverId: '<%= reciever?._id %>', chatId: '<%= currentChat?._id %>', message, replyToMessageId});
+
+        sendMessageInput.value = ''
+        chatCards.scrollTop = chatCards.scrollHeight;
+        unselectReply();
+    }
+
+    socket.on("message-recieved", ({message, senderId, newMessage, replyingMessage})=>{
+
+        const time = new Date();
+
+        const chats = document.getElementById("chats");
+
+        const chatCard = document.createElement('div');
+
+        if ( senderId == "<%= user?._id %>" ) chatCard.classList = "chat-card right";
+        else chatCard.classList = "chat-card left";
+
+        chatCard.id = newMessage?._id;
+
+        // Options div
+
+        const options = document.createElement("div");
+        options.classList = "options";
+
+        options.innerHTML = `
+                            <button onclick="togglePanel('${newMessage?._id}')"><i class="fa-solid fa-face-smile" id="emoji-btn"></i></button>
+                            <button onclick="selectReply('${newMessage?._id}')"><i class="fa-solid fa-reply"></i></button>
+                            <button><i class="fa-solid fa-ellipsis"></i></button>
+                            `
+
+        // Reply Pera div
+
+        const replyPera = document.createElement("p");
+        replyPera.classList = 'reply-pera';
+        replyPera.addEventListener("click", ()=>{
+            let message = document.getElementById(replyingMessage?._id);
+            if (message) {
+                message.scrollIntoView({ behavior: "smooth", block: "center" });
+                message.style.transform = "translateX(-10px)";
+
+                setTimeout(()=>{
+                    message.style.transform = "translateX(0px)";
+                }, 700)
+            }
+        })
+
+        replyPera.innerText = replyingMessage?.content;
+
+        // Content Wrapper div
+
+        const contentWrapper = document.createElement("div");
+        contentWrapper.classList = "content-wrapper";
+
+        // Text Time div
+
+        const textTimeDiv = document.createElement("div");
+        textTimeDiv.classList = "text-time";
+
+        const Pmessage = document.createElement("p");
+        Pmessage.innerText = message;
+
+        const timeSpan = document.createElement("span");
+        timeSpan.innerText = `${time.getHours()}:${time.getMinutes()}`;
+
+        textTimeDiv.append(Pmessage, timeSpan);
+
+        // Reactions div
+
+        const reactionsDiv = document.createElement("div");
+        reactionsDiv.classList = "reactions";
+
+        contentWrapper.append(textTimeDiv, reactionsDiv);
+
+        chatCard.appendChild(options)
+        if (replyingMessage) chatCard.append(replyPera);
+        chatCard.append(contentWrapper)
+
+        chats.append(chatCard);
+        
+        chatCards.scrollTop = chatCards.scrollHeight;
+
+    });
+
+    function addReaction(reaction){
+
+        const messageId = document.getElementById("panel")?.dataset?.id;
+
+        if (!messageId) return;
+
+        socket.emit("add-reaction", { user: '<%= user?.userhandle %>', reaction, messageId });
+        togglePanel();
+
+        const messageReactions = document.getElementById(messageId);
+        console.log(messageId)
+        const isReactionExist = messageReactions.querySelector(".reactions").querySelector(`.${reaction}`)
+
+        if ( isReactionExist ) {
+
+            // The message already has this reaction so just increase the count
+
+            let counter = isReactionExist.querySelector('span');
+
+            const newValue = 1 + Number(counter.innerText)
+
+            counter.innerText = newValue
+        } else {
+            
+            // Add reaction in message
+
+            const reactionDiv = document.createElement("div");
+            reactionDiv.classList = `reaction ${reaction}`;
+
+            const reactionImg = document.createElement("img");
+            reactionImg.src = `/assets/emojis/face/${reaction}.png`;
+            reactionImg.alt = reaction;
+            reactionImg.style.width = "24px";
+            reactionImg.style.height = "24px";
+
+            const reactionCouterSpan = document.createElement("span");
+            reactionCouterSpan.innerText = "1";
+
+            reactionDiv.append(reactionImg);
+            reactionDiv.append(reactionCouterSpan);
+            messageReactions.querySelector(".reactions").append(reactionDiv);
+        }
+
+        isReactionExist.style.scale = 1.1;
+
+        setTimeout(()=>{
+            isReactionExist.style.scale = .9;
+        }, 500);
+    }
+
+    socket.on("reaction-added", ({reaction, messageId}) => {
+
+        const messageReactions = document.getElementById(messageId);
+        const isReactionExist = messageReactions?.querySelector(".reactions")?.querySelector(`.${reaction}`)
+
+        if ( isReactionExist ) {
+
+            // The message already has this reaction so just increase the count
+
+            let counter = isReactionExist.querySelector('span');
+
+            const newValue = 1 + Number(counter.innerText)
+
+            counter.innerText = newValue
+        } else {
+            
+            // Add reaction in message
+
+            const reactionDiv = document.createElement("div");
+            reactionDiv.classList = `reaction ${reaction}`;
+
+            const reactionImg = document.createElement("img");
+            reactionImg.src = `/assets/emojis/face/${reaction}.png`;
+            reactionImg.alt = reaction;
+            reactionImg.style.width = "24px";
+            reactionImg.style.height = "24px";
+
+            const reactionCouterSpan = document.createElement("span");
+            reactionCouterSpan.innerText = "1";
+
+            reactionDiv.append(reactionImg);
+            reactionDiv.append(reactionCouterSpan);
+            messageReactions.querySelector(".reactions").append(reactionDiv);
+        }
+
+        isReactionExist.style.scale = 1.1;
+
+        setTimeout(()=>{
+            isReactionExist.style.scale = 1;
+        }, 500);
+        
+    })
+
+    socket.on('user-connect', ({user}) => {
+        const contacts = document.querySelectorAll(".contact-card");
+
+        contacts.forEach( contact => {
+            
+            if ( user == contact.dataset.user ){
+                contact.classList.add("online");
+                socket.emit('im-online', { user: '<%= user?.userhandle %>' })
+                return;
+            }
+        })
+    });
+
+    socket.on("already-online", ({ user })=>{
+        const contacts = document.querySelectorAll(".contact-card");
+
+        contacts.forEach( contact => {
+            
+            if ( user == contact.dataset.user ){
+                contact.classList.add("online");
+                return;
+            }
+        })
+    })
+
+    // Calling Functionality
+
+    const config = {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' }
+        ]
+    };
+
+    async function connectPeer(){
+
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        localStream = stream;
+        localVideo.srcObject = stream;
+
+        peer = new RTCPeerConnection();
+        localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
+
+        peer.ontrack = (e) =>{
+            remoteVideo.srcObject = e.streams[0];
+        }
+
+        peer.onicecandidate = (e) => {
+            if (e.candidate) {
+                socket.emit('ice-candidate', {candidate: e.candidate});
+            }
+        };
+
+    }
+
+    async function startCall(){
+
+        showVoiceCallModal(false)
+        await connectPeer();
+
+        const offer = await peer.createOffer();
+        await peer.setLocalDescription(offer);
+
+        socket.emit("offer", {offer});
+
+    }
+
+    let acceptCall = () => {};
+    let rejectCall = () => {
+        
+        socket.emit("call-reject");
+
+        hideVoiceCallModal();
+    }
+
+    const toggleMute = () => {
+
+        const muteBtn = document.getElementById("muteBtn");
+
+        if (muteBtn.classList.contains("fa-microphone-slash")){
+            
+            // Unmute
+            localStream?.getTracks()?.forEach(track => {
+                track.enabled = true;
+                muteBtn.classList = "fa-solid fa-microphone";
+            })
+        } else {
+
+            // Mute
+            localStream?.getTracks()?.forEach(track => {
+                track.enabled = false;
+                muteBtn.classList = "fa-solid fa-microphone-slash";
+            })
+        }
+
+    }
+
+    socket.on("offer", ({ offer }) => {
+        
+        showVoiceCallModal(true);
+        acceptCall = async () => {
+            
+            hideVoiceCallModal()
+            showVoiceCallModal(false);
+            
+            await connectPeer();
+        
+            await peer.setRemoteDescription(offer);
+        
+            const answer = await peer.createAnswer();
+            await peer.setLocalDescription(answer);
+        
+            socket.emit("answer", {answer});            
+        }
+    });
+
+    socket.on("answer", async ({answer}) => {
+        
+        await peer.setRemoteDescription(answer);
+    });
+
+    socket.on("call-reject", ()=> {
+
+        peer.close();
+        peer = null;
+
+        remoteVideo.srcObject = null;
+        localVideo.srcObject = null;
+        hideVoiceCallModal()
+    })
+
+    socket.on('ice-candidate', async ({candidate}) => {
+
+        await peer.addIceCandidate(new RTCIceCandidate(candidate));
+    });
+</script>
+</body>
+</html>
