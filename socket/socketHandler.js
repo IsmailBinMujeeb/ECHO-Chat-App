@@ -25,9 +25,10 @@ const socketHandler = (server) => {
             try {
 
                 const replyingMessage = await messageModel.findById(replyToMessageId);
+                let newMessage
 
                 if (replyingMessage) {
-                    const newMessage = await messageModel.create({
+                    newMessage = await messageModel.create({
                         senderId,
                         recieverId,
                         chatId,
@@ -35,7 +36,7 @@ const socketHandler = (server) => {
                         content: message,
                     });
                 } else {
-                    const newMessage = await messageModel.create({
+                    newMessage = await messageModel.create({
                         senderId,
                         recieverId,
                         chatId,
@@ -43,11 +44,43 @@ const socketHandler = (server) => {
                     });
                 }
 
-                socket.to(socket.data.roomId).emit("message-recieved", { message });
+                io.to(socket.data.roomId).emit("message-recieved", { message, senderId, newMessage, replyingMessage });
             } catch (error) {
                 throw new Error(error.message)
             }
-        })
+        });
+
+        socket.on("add-reaction", async ({ user, reaction, messageId }) => {
+
+            try {
+
+                if (!messageId) return
+                await messageModel.findOneAndUpdate({ _id: messageId }, {
+                    $push: { reactions: { user, reaction } }
+                })
+
+                socket.to(socket.data.roomId).emit("reaction-added", { reaction, messageId });
+            } catch (error) {
+                throw new Error(error.message)
+            }
+        });
+
+        socket.on('offer', ({ offer }) => {
+            socket.to(socket.data.roomId).emit('offer', { offer });
+        });
+
+        socket.on('answer', ({ answer }) => {
+            socket.to(socket.data.roomId).emit('answer', { answer });
+        });
+
+        socket.on('call-reject', () => {
+            socket.to(socket.data.roomId).emit('call-reject');
+        });
+
+        socket.on('ice-candidate', ({ candidate }) => {
+            socket.to(socket.data.roomId).emit('ice-candidate', { candidate });
+        });
+
     })
 }
 
