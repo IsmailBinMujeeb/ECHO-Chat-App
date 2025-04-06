@@ -15,10 +15,10 @@ export const signupPostController = async (req, res) => {
     if (!userhandle || !email || !password) throw new ApiError(400, 'missing credentials');
 
     const isUserExist = await userModel.findOne({
-        $or: [{ userModel }, { email }]
+        $or: [{ userhandle }, { email }]
     });
 
-    if (isUserExist) throw new ApiError(409, 'message user with this email or userhandle already exist');
+    if (isUserExist) throw new ApiError(409, 'user with this email or userhandle already exist');
 
     const user = await userModel.create({
         userhandle,
@@ -28,19 +28,10 @@ export const signupPostController = async (req, res) => {
 
     const { ACCESS_TOKEN, REFRESH_TOKEN } = user.generateAuthTokens();
 
-    const createdUser = await userModel.findById(user._id).select("-password -refreshToken");
+    res.cookie('ACCESS_TOKEN', ACCESS_TOKEN, { httpOnly: true, secure: true, maxAge: 9999999999 });
+    res.cookie('REFRESH_TOKEN', REFRESH_TOKEN, { httpOnly: true, secure: true, maxAge: 99999999999 });
 
-    res.cookie('ACCESS_TOKEN', ACCESS_TOKEN, {
-        httpOnly: true,
-        secure: true,
-    })
-
-    res.cookie('REFRESH_TOKEN', REFRESH_TOKEN, {
-        httpOnly: true,
-        secure: true,
-    })
-
-    res.status(200).json(new ApiResponse(200, createdUser, 'success'));
+    res.redirect('/');
 
 }
 
@@ -51,13 +42,11 @@ export const signinController = (req, res) => {
 
 export const signinPostController = async (req, res) => {
 
-    const { userhandle, email, password } = req.body;
+    const { userhandle, password } = req.body;
 
-    if (!(userhandle || email) || !password) throw new ApiError(400, 'missing cridentials');
+    if (!userhandle || !password) throw new ApiError(400, 'missing cridentials');
 
-    const user = await userModel.findOne({
-        $or: [{ userhandle }, { email }]
-    });
+    const user = await userModel.findOne({userhandle});
 
     if (!user) throw new ApiError(409, 'Invalid Cridentials');
 
@@ -67,12 +56,10 @@ export const signinPostController = async (req, res) => {
 
     const { ACCESS_TOKEN, REFRESH_TOKEN } = user.generateAuthTokens();
 
-    const loggedInUser = await userModel.findById(user._id).select("-password -refreshToken");
+    res.cookie('ACCESS_TOKEN', ACCESS_TOKEN, { httpOnly: true, secure: true, maxAge: 99999999 });
+    res.cookie('REFRESH_TOKEN', REFRESH_TOKEN, { httpOnly: true, secure: true, maxAge: 999999999 });
 
-    res.cookie('ACCESS_TOKEN', ACCESS_TOKEN, { httpOnly: true, secure: true });
-    res.cookie('REFRESH_TOKEN', REFRESH_TOKEN, { httpOnly: true, secure: true });
-
-    return res.status(200).json(new ApiResponse(200, loggedInUser, 'success'));
+    return res.redirect('/');
 }
 
 export const logoutPostController = async (req, res) => {
@@ -88,7 +75,7 @@ export const logoutPostController = async (req, res) => {
     res.clearCookie('ACCESS_TOKEN', { httpOnly: true, secure: true });
     res.clearCookie('REFRESH_TOKEN', { httpOnly: true, secure: true });
 
-    res.status(200).json(new ApiResponse(200, {}, 'user logged out'))
+    res.redirect('/user/signin');
 }
 
 export const refreshAccessTokenController = async (req, res) => {
@@ -107,8 +94,8 @@ export const refreshAccessTokenController = async (req, res) => {
 
     const { ACCESS_TOKEN, REFRESH_TOKEN } = user.generateAuthTokens();
 
-    res.cookie('ACCESS_TOKEN', ACCESS_TOKEN, { httpOnly: true, secure: true });
-    res.cookie('REFRESH_TOKEN', REFRESH_TOKEN, { httpOnly: true, secure: true });
+    res.cookie('ACCESS_TOKEN', ACCESS_TOKEN, { httpOnly: true, secure: true, maxAge: 99999999999 });
+    res.cookie('REFRESH_TOKEN', REFRESH_TOKEN, { httpOnly: true, secure: true, maxAge: 999999999999 });
 
     res.status(200).json(new ApiResponse(200, {}, 'tokens regenereated'));
 
