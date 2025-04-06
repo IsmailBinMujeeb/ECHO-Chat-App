@@ -1,0 +1,18 @@
+<%- include('layouts/head.ejs', { title: 'SignIn - Page', css: ['register_page'] }) %>
+
+<main>
+    <div class="logo">
+        ECHO
+    </div>
+    <div class="form-wrapper">
+        <form action="/user/signin" method="post">
+            <label for="userhandle">Userhandle</label>
+            <input type="text" id="userhandle" name="userhandle" placeholder="Userhandle" required><br>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Password" required><br>
+            <button type="submit" id="submitBtn">Submit</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>
