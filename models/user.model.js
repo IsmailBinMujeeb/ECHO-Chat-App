@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { hashPasswordMongooseMiddleware, comparePasswordMongooseMiddleware } from "../middlewares/password.mongoose.middleware.js";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema({
 
@@ -51,6 +51,12 @@ const userSchema = new mongoose.Schema({
     refreshToken: {
         type: String,
         default: '',
+    },
+
+    publicKey: {
+        type: String,
+        unique: [true, "public key must be unique in user model"],
+        default: ""
     }
 
 }, { timestamps: true });
@@ -67,6 +73,6 @@ userSchema.method('generateAuthTokens', function () {
     this.save()
 
     return { ACCESS_TOKEN, REFRESH_TOKEN }
-})
+});
 
 export default mongoose.model('user', userSchema);
