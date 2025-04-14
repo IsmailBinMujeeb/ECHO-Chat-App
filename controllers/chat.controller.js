@@ -6,23 +6,23 @@ import messageModel from "../models/message.model.js";
 
 export const chatController = async (req, res) => {
 
-    const { recieverHandle } = req.params;
+    const { receiverHandle } = req.params;
 
-    if (!recieverHandle) throw new ApiError(400, 'reciever handle not provided');
+    if (!receiverHandle) throw new ApiError(400, 'receiver handle not provided');
 
-    const reciever = await userModel.findOne({ userhandle: recieverHandle });
+    const receiver = await userModel.findOne({ userhandle: receiverHandle });
 
-    if (!reciever) { } // TODO: Add exception
+    if (!receiver) { } // TODO: Add exception
 
     const sender = req.user;
 
     const ischatExist = await chatModel.findOne({
         $or: [
             {
-                $and: [{ senderId: sender?._id }, { recieverId: reciever?._id }]
+                $and: [{ senderId: sender?._id }, { receiverId: receiver?._id }]
             },
             {
-                $and: [{ senderId: reciever?._id }, { recieverId: sender?._id }]
+                $and: [{ senderId: receiver?._id }, { receiverId: sender?._id }]
             }
         ]
     });
@@ -32,9 +32,9 @@ export const chatController = async (req, res) => {
     if (!chat) {
 
         const newChat = await chatModel.create({
-            chatId: `${String(sender?._id)}.${String(reciever?._id)}`,
+            chatId: `${String(sender?._id)}.${String(receiver?._id)}`,
             senderId: sender?._id,
-            recieverId: reciever?._id,
+            receiverId: receiver?._id,
         });
 
         chat = newChat;
@@ -45,7 +45,7 @@ export const chatController = async (req, res) => {
             $match: {
                 $or: [
                     { senderId: new mongoose.Types.ObjectId(sender?._id) },
-                    { recieverId: new mongoose.Types.ObjectId(sender?._id) },
+                    { receiverId: new mongoose.Types.ObjectId(sender?._id) },
                 ]
             }
         },
@@ -53,9 +53,9 @@ export const chatController = async (req, res) => {
         {
             $lookup: {
                 from: "users",
-                localField: "recieverId",
+                localField: "receiverId",
                 foreignField: "_id",
-                as: "reciever",
+                as: "receiver",
             }
         },
 
@@ -69,71 +69,5 @@ export const chatController = async (req, res) => {
         },
     ]);
 
-    const messages = await messageModel.aggregate([
-        {
-            $match: {
-                chatId: chat?._id
-            }
-        },
-
-        {
-            $lookup: {
-                from: "users",
-                localField: "senderId",
-                foreignField: "_id",
-                as: "sender",
-            }
-        },
-
-        {
-            $lookup: {
-                from: "users",
-                localField: "recieverId",
-                foreignField: "_id",
-                as: "reciever",
-            }
-        },
-
-        {
-            $lookup: {
-                from: "messages",
-                localField: "replyTo",
-                foreignField: "_id",
-                as: "replyTo",
-            }
-        },
-
-        {
-            $addFields: {
-                reactionsCount: {
-                    $arrayToObject: {
-                        $map: {
-                            input: {
-                                $setUnion: [
-                                    { $map: { input: "$reactions", as: "r", in: "$$r.reaction" } }
-                                ]
-                            },
-                            as: "reactionType",
-                            in: {
-                                k: "$$reactionType",
-                                v: {
-                                    $size: {
-                                        $filter: {
-                                            input: "$reactions",
-                                            as: "r",
-                                            cond: { $eq: ["$$r.reaction", "$$reactionType"] }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                    }
-                }
-            }
-        }
-    ])
-
-    // res.json(...messages)
-
-    res.render('chat_page', { currentChat: chat, chats, user: sender, reciever, messages });
+    res.render('chat_page', { currentChat: chat, chats, user: sender, receiver });
 }
