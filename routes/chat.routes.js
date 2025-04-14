@@ -5,6 +5,6 @@ import {authenticate} from "../middlewares/auth.middleware.js"
 
 const router = Router();
 
-router.get('/:recieverHandle', asyncHandler(authenticate), asyncHandler(chatController));
+router.get('/:receiverHandle', asyncHandler(authenticate), asyncHandler(chatController));
 
 export default router;
