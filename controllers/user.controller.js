@@ -10,7 +10,7 @@ export const signupController = (req, res) => {
 
 export const signupPostController = async (req, res) => {
 
-    const { userhandle, email, password } = req.body;
+    const { userhandle, email, password, publicKey } = req.body;
 
     if (!userhandle || !email || !password) throw new ApiError(400, 'missing credentials');
 
@@ -24,6 +24,7 @@ export const signupPostController = async (req, res) => {
         userhandle,
         email,
         password,
+        publicKey
     });
 
     const { ACCESS_TOKEN, REFRESH_TOKEN } = user.generateAuthTokens();
