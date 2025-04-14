@@ -1,5 +1,7 @@
 import { Server } from "socket.io";
 import messageModel from "../models/message.model.js";
+import crypto from "crypto"
+import userModel from "../models/user.model.js";
 
 const socketHandler = (server) => {
 
@@ -20,31 +22,40 @@ const socketHandler = (server) => {
             })
         });
 
-        socket.on("emit-message", async ({ message, senderId, recieverId, chatId, replyToMessageId }) => {
+        socket.on("emit-message", async ({ senderEncryptedMessage, receiverEncryptedMessage, senderId, receiverId, chatId, replyToMessageId }) => {
 
             try {
 
+                let newMessage;
+
                 const replyingMessage = await messageModel.findById(replyToMessageId);
-                let newMessage
+
+                console.log(senderEncryptedMessage, receiverEncryptedMessage)
 
                 if (replyingMessage) {
+
                     newMessage = await messageModel.create({
                         senderId,
-                        recieverId,
+                        receiverId,
                         chatId,
                         replyTo: replyToMessageId || null,
-                        content: message,
+                        senderEncryptedMessage,
+                        receiverEncryptedMessage,
                     });
+
                 } else {
+
                     newMessage = await messageModel.create({
                         senderId,
-                        recieverId,
+                        receiverId,
                         chatId,
-                        content: message,
+                        senderEncryptedMessage,
+                        receiverEncryptedMessage,
                     });
+                    
                 }
 
-                io.to(socket.data.roomId).emit("message-recieved", { message, senderId, newMessage, replyingMessage });
+                io.to(socket.data.roomId).emit("message-recieved", { receiverEncryptedMessage, senderId, newMessage, replyingMessage });
             } catch (error) {
                 throw new Error(error.message)
             }
