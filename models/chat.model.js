@@ -13,11 +13,11 @@ const chatSchema = new mongoose.Schema({
         require: [true, 'sender id is require in chat model'],
     },
 
-    recieverId: {
+    receiverId: {
 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',
-        require: [true, 'reciever id is require in chat model'],
+        require: [true, 'receiver id is require in chat model'],
     }
 }, { timestamps: true });
 
