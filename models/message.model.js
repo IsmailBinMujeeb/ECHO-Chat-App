@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const reactionSchema = mongoose.Schema({
     user: String,
@@ -13,10 +14,10 @@ const messageSchema = mongoose.Schema({
         require: [true, 'sender id is required in message model'],
     },
 
-    recieverId: {
+    receiverId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',
-        require: [true, 'reciever id is required in message model'],
+        require: [true, 'receiver id is required in message model'],
     },
 
     chatId: {
@@ -25,10 +26,14 @@ const messageSchema = mongoose.Schema({
         require: [true, 'chat id is required in message model'],
     },
 
-    content: {
+    senderEncryptedMessage: {
         type: String,
-        default: '',
-        trim: true,
+        require: [true, 'sender encrypted message is required in message model'],
+    },
+
+    receiverEncryptedMessage: {
+        type: String,
+        require: [true, 'receiver encrypted message is required in message model'],
     },
 
     reactions: [{
@@ -41,5 +46,7 @@ const messageSchema = mongoose.Schema({
         default: null
     }
 }, { timestamps: true });
+
+messageSchema.plugin(mongooseAggregatePaginate);
 
 export default mongoose.model('message', messageSchema);
