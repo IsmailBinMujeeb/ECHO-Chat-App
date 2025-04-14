@@ -1,0 +1,576 @@
+@import "./variable.css";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    min-height: 100vh;
+    height: 100vh;
+    max-height: 100vh;
+    width: 100vw;
+    max-width: 100vw;
+    font-family: "Montserrat", sans-serif;
+}
+
+main {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    background-color: var(--echo-deep);
+}
+
+/* Contact CSS */
+#contactList {
+    background-color: var(--echo-bg);
+    height: 100%;
+    width: 20%;
+    border-top-right-radius: 30px;
+}
+
+.contact-wrapper {
+    height: 100%;
+}
+
+.contacts {
+    margin: 10px;
+    height: 80%;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.contacts::-webkit-scrollbar {
+    display: none;
+}
+
+.contact-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--echo-text);
+    position: relative;
+    padding: 5px;
+    margin: 5px 0px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.1s;
+}
+
+.contact-card img {
+    border-radius: 100%;
+}
+
+.contact-card:hover {
+    background-color: var(--echo-dark);
+}
+
+.online img {
+    border: 2px solid var(--echo-purple);
+}
+
+.userhandle-message p {
+    font-size: 0.9em;
+    padding: 5px;
+    color: var(--echo-muted);
+}
+
+.time-unreadmsg {
+    margin-left: auto;
+}
+
+.time-unreadmsg p {
+    color: var(--echo-muted);
+    font-size: 0.8em;
+    font-weight: bold;
+    float: right;
+    margin-bottom: auto;
+}
+
+/* Chat CSS */
+#chat {
+    height: 100%;
+    width: 80%;
+}
+
+.chat-wrapper {
+    height: 100%;
+    width: 100%;
+}
+
+.receiver-wrapper {
+    background-color: var(--echo-dark);
+    color: var(--echo-text);
+    height: 8%;
+    width: 95%;
+    border-radius: 10px;
+    margin: 0px auto;
+    position: sticky;
+    top: 2%;
+    display: flex;
+    justify-content: left;
+    padding: 10px;
+    align-items: center;
+    text-transform: capitalize;
+    gap: 10px;
+    font-weight: bold;
+}
+
+.receiver-wrapper div {
+    margin-left: auto;
+
+    & button {
+        margin: 0px 10px;
+        font-size: 1.2em;
+    }
+}
+
+.voice-call-wrapper {
+    background-color: var(--echo-dark);
+    color: var(--echo-text);
+    height: 8%;
+    border-radius: 10px;
+    border: 2px solid var(--echo-muted);
+    position: absolute;
+    top: 2%;
+    transition: all 0.3s;
+    left: 50%;
+    transform: translateX(-50%);
+    transform: translateY(-100px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    align-items: center;
+    text-transform: capitalize;
+    gap: 10px;
+    font-weight: bold;
+    scale: 0;
+}
+
+.voice-call-wrapper i {
+    padding: 10px;
+    border-radius: 100%;
+    color: var(--echo-text);
+}
+
+.voice-call-wrapper i.fa-phone {
+    background-color: #57f287;
+    display: none;
+}
+
+.voice-call-wrapper i.fa-phone-slash {
+    background-color: #ed4245;
+}
+
+#chats {
+    color: var(--echo-text);
+    padding: 15px;
+    height: 76%;
+    position: sticky;
+    top: 12%;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+#chats::-webkit-scrollbar {
+    display: none;
+}
+
+#chatLoader {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    padding: 10px 20px;
+    display: flex;
+    gap: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: pulse 1.5s infinite alternate;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: blink 1.4s infinite;
+}
+
+.dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+#chats .chat-date {
+    position: sticky;
+    z-index: 10;
+    padding: 5px 20px;
+    border-radius: 30px;
+    background-color: rgba(0, 0, 0, 0.3);
+    top: 0px;
+    justify-self: center;
+}
+
+#chats .chat-card {
+    margin: 10px 0;
+    padding: 5px 10px;
+    border-radius: 10px;
+    transition: all 1s;
+    width: fit-content;
+    max-width: 70%;
+    word-wrap: break-word;
+    cursor: pointer;
+    position: relative;
+    clear: both;
+}
+
+#chats .chat-card .content-wrapper .text-time {
+    display: flex;
+    align-items: top;
+    justify-content: space-between;
+    width: 100%;
+}
+
+#chats .chat-card .content-wrapper .text-time p:last-of-type {
+    width: fit-content;
+    max-width: 90%;
+    word-wrap: break-word;
+    cursor: pointer;
+    padding: 2px;
+    position: relative;
+    justify-self: left;
+}
+
+#chats .chat-card .text-time span {
+    padding: 2px;
+    padding-top: 8px;
+    font-weight: bold;
+    font-size: 0.7em;
+    justify-self: right;
+    text-align: bottom;
+    height: 100%;
+}
+
+#chats .chat-card:hover .options {
+    opacity: 1;
+    transform: translateX(0);
+    scale: 1;
+}
+
+.options {
+    opacity: 0;
+    scale: 0.5;
+    border: 2px solid var(--echo-dark);
+    background-color: var(--echo-deep);
+    padding: 5px 0;
+    width: 100px;
+    border-radius: 10px;
+    position: absolute;
+    top: 0%;
+    transition: all 0.3s;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.reply-pera {
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.171);
+    border-radius: 10px;
+    font-weight: bold;
+    border-left: 10px solid var(--echo-text);
+    margin-bottom: 5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+button {
+    background-color: transparent;
+    color: var(--echo-muted);
+    border: none;
+    height: 100%;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+button i:hover {
+    color: #fff;
+}
+
+.chat-card .content-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    flex-direction: column;
+}
+
+.left {
+    justify-self: left;
+    background-color: var(--echo-bg);
+    font-weight: bolder;
+    animation: appear-left linear;
+    animation-timeline: view();
+    animation-range: entry 0;
+}
+
+.left span {
+    color: var(--echo-muted);
+}
+
+.left .options {
+    transform: translateX(-40%);
+    right: calc(-100px - 10px);
+}
+
+.right {
+    justify-self: right;
+    background-color: var(--echo-purple);
+    font-weight: bolder;
+    animation: appear-right linear;
+    animation-timeline: view();
+    animation-range: entry 0;
+}
+
+.right span {
+    color: var(--echo-text);
+}
+
+.right .options {
+    transform: translateX(20%);
+    left: calc(-100px - 10px);
+}
+
+#chat .reactions {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 0.375rem;
+    margin-top: 0.25rem;
+}
+
+#chat .reactions .reaction {
+    padding: 0 0.375rem 0 0.25rem;
+    line-height: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    height: 1.875rem;
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 1.75rem;
+    transition: scale 0.3s;
+}
+
+#chat .reactions .reaction img {
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+    margin: 0.25rem;
+    scale: 0.9;
+}
+
+#chat .reactions .reaction:hover img {
+    -webkit-filter: grayscale(0%);
+    filter: grayscale(0%);
+    scale: 1;
+}
+
+.input-wrapper {
+    background-color: var(--echo-dark);
+    height: 8%;
+    width: 95%;
+    border-radius: 10px;
+    margin: 0px auto;
+    position: sticky;
+    top: 90%;
+    display: flex;
+    justify-content: space-between;
+}
+
+#reply-wrapper {
+    position: sticky;
+    opacity: 0;
+    pointer-events: none;
+    margin: 0 auto;
+    top: 85%;
+    color: var(--echo-text);
+    z-index: 100;
+    width: 95%;
+    height: fit-content;
+    padding: 10px;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    background-color: var(--echo-darker);
+    border: 2px solid var(--echo-muted);
+    transition: all 0.1s;
+}
+
+#reply-wrapper i {
+    float: right;
+    color: var(--echo-muted);
+    font-size: 1.2em;
+    cursor: pointer;
+
+    &:hover {
+        color: #fff;
+    }
+}
+
+.input-wrapper input {
+    background-color: transparent;
+    color: white;
+    border: none;
+    height: 100%;
+    width: 80%;
+    margin-left: 10px;
+    font-size: 1.2em;
+}
+
+.input-wrapper input:focus {
+    border: none;
+    outline: none;
+}
+
+.input-wrapper button {
+    background-color: transparent;
+    color: var(--echo-muted);
+    border: none;
+    width: 60px;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+.input-wrapper button:last-of-type {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.input-wrapper button:first-of-type {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.input-wrapper button i:hover {
+    color: #fff;
+}
+
+.input-wrapper button #emojis:hover {
+    color: #fee75c;
+    scale: 1.1;
+}
+
+/* Call Section */
+
+#callSection {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Animations */
+
+@keyframes appear-left {
+    from {
+        opacity: 0;
+        transform: translateX(-100px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0px);
+    }
+}
+
+@keyframes appear-right {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0px);
+    }
+}
+
+@keyframes blink {
+
+    0%,
+    80%,
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+
+    40% {
+        opacity: 1;
+        transform: scale(1.3);
+    }
+}
+
+@keyframes pulse {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.02);
+    }
+}
+
+/* Panels */
+
+#panel {
+    opacity: 0;
+    scale: 0;
+    width: 250px;
+    min-width: 250px;
+    max-width: 250px;
+    height: fit-content;
+    max-height: 400px;
+    gap: 10px;
+    padding: 10px;
+    z-index: 100;
+    background-color: var(--echo-deep);
+    border: 2px solid var(--echo-dark);
+    color: var(--echo-muted);
+    width: fit-content;
+    transition: all 0.3s;
+    border-radius: 10px;
+    position: fixed;
+    top: 20%;
+    left: 50%;
+}
+
+#panel .main-panel-wrapper {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+#panel .main-panel-wrapper img {
+    cursor: pointer;
+}
+
+.activate {
+    opacity: 1;
+    scale: 1;
+}
